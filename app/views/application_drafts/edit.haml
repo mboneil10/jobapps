@@ -3,7 +3,7 @@
   - if @site_text.present?
     For a quick tutorial, please click
     = link_to 'here.', site_text_url(@site_text)
-    
+
 - if @draft.application_template.eeo_enabled?
   .note_item
     This application requests equal employment opportunity (EEO) data from applicants.
@@ -64,7 +64,7 @@
         .actions
           = f.submit 'Save changes and continue editing'
           = f.submit 'Preview changes'
-    .button_column.col-sm-3 
+    .button_column.col-sm-3
       - @draft.questions.each do |question|
         - unless question.new_record?
           .button_row

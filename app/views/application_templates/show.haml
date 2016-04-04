@@ -21,6 +21,20 @@
       Fields marked with an asterisk (
       %span.ast *
       ) are required.
+    - if should_allow_form_refilling? && @old_applications.present?
+      .row#old_application_block
+        .col-md-8.col-md-offset-2#subtitle
+          You have some old applications you can take responses from!
+        %table.col-md-8.col-md-offset-2
+          %tr
+            %th
+              Submitted
+          - @old_applications.each do |app|
+            %tr
+              %td
+                = format_date_time app.created_at
+              %td.load_column
+                = link_to 'Load reponses', url_for(params.merge(:load_id => app.id))
     = form_tag controller: :application_records, action: :create do
       = fields_for :user do |u|
         .field
@@ -51,37 +65,46 @@
                   - case question.data_type
                   - when 'phone-number'
                     = r.text_field question.prompt, required: question.required?,
-                      class: 'phone', size: 20, placeholder: '(XXX) XXX-XXXX'
+                      class: 'phone', size: 20, placeholder: '(XXX) XXX-XXXX',
+                      value: @old_data[question.id] || ""
                   - when 'long-text'
                     = r.text_area question.unique_name,
                       required: question.required?,
-                      size: '50x5'
+                      size: '50x5',
+                      value: @old_data[question.id] || ""
                   - when 'text'
                     = r.text_field question.unique_name,
                       required: question.required?,
-                      size: 50
+                      size: 50,
+                      value: @old_data[question.id] || ""
                   - when 'date'
                     = r.text_field question.unique_name,
                       required: question.required?,
                       class: 'datepicker',
                       placeholder: 'Click here to select date...',
-                      size: 40
+                      size: 40,
+                      value: @old_data[question.id] || ""
                   - when 'number'
                     = r.number_field question.unique_name,
-                      required: question.required?
+                      required: question.required?,
+                      value: (@old_data[question.id] || "").to_i
                   - when 'yes/no'
                     Yes
                     = r.radio_button question.unique_name, 'Yes',
-                      required: question.required?
+                      required: question.required?,
+                      checked: @old_data[question.id] == 'Yes'
                     No
                     = r.radio_button question.unique_name, 'No',
-                      required: question.required?
+                      required: question.required?,
+                      checked: @old_data[question.id] == 'No'
                   - if question.required?
                     %span.ast *
             = r.hidden_field question.unique_prompt_name,
               value: question.prompt
             = r.hidden_field question.unique_data_type_name,
               value: question.data_type
+            = r.hidden_field question.id,
+              value: "#{question.id}-#{question.number}"
       = hidden_field_tag :position_id, @template.position_id
       - if @template.eeo_enabled?
         .heading Voluntary Equal Employment Opportunity Information

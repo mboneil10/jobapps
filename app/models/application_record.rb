@@ -51,6 +51,10 @@ class ApplicationRecord < ActiveRecord::Base
     self
   end
 
+  def questions_hash
+    data.map{|arr| [arr[3], arr[1]]}.select{|arr| [arr[0], arr[1]].all?}.to_h
+  end
+
   def deny_with(staff_note)
     update staff_note: staff_note
     if configured_value [:on_application_denial, :notify_applicant],
